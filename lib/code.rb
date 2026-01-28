@@ -33,16 +33,31 @@ class Code
 
     return guess if valid_choice?(guess)
 
-    puts 'Invalid move, try again'
+    puts 'INVALID MOVE!'
+    player_guess
   end
 
   def valid_choice?(guess)
     # length is exactly 4
-    # guess.length == 4 && guess.include?(ALLOWED_COLORS)
     guess.length == 4 && guess.all? { |color| ALLOWED_COLORS.include?(color) }
+  end
+
+  def check_color_matches(secret1, guess1)
+    secret1 = %w[R G B Y]
+    guess1 = %w[R B G Y]
+    secret1.each_with_index do |col1, i|
+      if col1 == guess1[i]
+        puts 'exact match'
+      elsif secret1.include?(guess1[i])
+        puts 'color match'
+      else
+        puts 'no match' # Compare secret at position c1 with guess at same position
+      end
+    end
   end
 end
 
 code = Code.new
-p code.generate_code
-p code.player_guess
+# p code.generate_code
+# p code.player_guess
+p code.check_color_matches(%w[R G B Y], %w[R B G Y])
