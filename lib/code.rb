@@ -1,4 +1,7 @@
+# generate random codes and validates against allowed colors
 class Code
+  ALLOWED_COLORS = %w[R G B Y O P].freeze
+
   def welcome_message
     puts '🎯 Welcome to Mastermind!'
     puts
@@ -18,4 +21,11 @@ class Code
     puts
     puts 'Good luck! 🧠✨'
   end
+
+  def generate_code
+    Array.new(4) { ALLOWED_COLORS.sample }
+  end
 end
+
+code = Code.new
+p code.generate_code
