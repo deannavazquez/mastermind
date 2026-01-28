@@ -25,7 +25,24 @@ class Code
   def generate_code
     Array.new(4) { ALLOWED_COLORS.sample }
   end
+
+  def player_guess
+    puts "Enter your guess (4 letters) using these colors: #{ALLOWED_COLORS}"
+    input = gets.chomp
+    guess = input.upcase.split(//)
+
+    return guess if valid_choice?(guess)
+
+    puts 'Invalid move, try again'
+  end
+
+  def valid_choice?(guess)
+    # length is exactly 4
+    # guess.length == 4 && guess.include?(ALLOWED_COLORS)
+    guess.length == 4 && guess.all? { |color| ALLOWED_COLORS.include?(color) }
+  end
 end
 
 code = Code.new
 p code.generate_code
+p code.player_guess
