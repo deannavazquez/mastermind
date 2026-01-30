@@ -1,6 +1,13 @@
 # generate random codes and validates against allowed colors
 class Code
   ALLOWED_COLORS = %w[R G B Y O P].freeze
+  attr_accessor :secret
+
+  def initialize
+    welcome_message
+    @secret = generate_code
+    player_guess
+  end
 
   def welcome_message
     puts '🎯 Welcome to Mastermind!'
@@ -27,14 +34,16 @@ class Code
   end
 
   def player_guess
+    puts '=== Starting player_guess ==='
     puts "Enter your guess (4 letters) using these colors: #{ALLOWED_COLORS}"
     input = gets.chomp
     guess = input.upcase.split(//)
-
-    return guess if valid_choice?(guess)
-
-    puts 'INVALID MOVE!'
-    player_guess
+    if valid_choice?(guess)
+      check_color_matches(@secret, guess)
+    else
+      puts 'INVALID MOVE!'
+      player_guess
+    end
   end
 
   def valid_choice?(guess)
@@ -42,13 +51,11 @@ class Code
     guess.length == 4 && guess.all? { |color| ALLOWED_COLORS.include?(color) }
   end
 
-  def check_color_matches(secret1, guess1)
-    secret1 = %w[R G B Y]
-    guess1 = %w[R B G Y]
-    secret1.each_with_index do |col1, i|
-      if col1 == guess1[i]
+  def check_color_matches(secret, guess)
+    secret.each_with_index do |col1, i|
+      if col1 == guess[i]
         puts 'exact match'
-      elsif secret1.include?(guess1[i])
+      elsif secret.include?(guess[i])
         puts 'color match'
       else
         puts 'no match' # Compare secret at position c1 with guess at same position
@@ -57,7 +64,7 @@ class Code
   end
 end
 
-code = Code.new
+Code.new
 # p code.generate_code
 # p code.player_guess
-p code.check_color_matches(%w[R G B Y], %w[R B G Y])
+# p code.check_color_matches(%w[R G B Y], %w[R B G Y])
