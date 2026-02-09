@@ -1,7 +1,7 @@
 # generate random codes and validates against allowed colors
 class Code
   ALLOWED_COLORS = %w[R G B Y O P].freeze
-  attr_accessor :secret
+  attr_accessor :secret, :player_guess, :exact_matches, :color_matches, :player_guess_size
 
   def initialize
     welcome_message
@@ -37,7 +37,7 @@ class Code
   def player_guess
     i = 1
     loop do
-      break if i > 12 || @secret == guess
+      break if i == 12
 
       puts "=== Starting player_guess #{i}/12 ==="
       puts "Enter your guess (4 letters) using these colors: #{ALLOWED_COLORS}"
@@ -47,8 +47,7 @@ class Code
         check_color_matches(@secret, guess)
         i += 1
       else
-        puts 'INVALID MOVE!'
-        player_guess
+        puts 'INVALID MOVE! Please enter a valid guess using the allowed colors and format.'
       end
     end
   end
@@ -58,14 +57,16 @@ class Code
     guess.length == 4 && guess.all? { |color| ALLOWED_COLORS.include?(color) }
   end
 
-  def check_color_matches(secret, guess)
+  def check_color_matches(secret, guess) # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
     guess_dup = guess.dup
     secret_dup = secret.dup
+    exact_matches = 0
+    color_matches = 0
 
     secret_dup.dup.each_with_index do |col1, i|
       next unless col1 == guess_dup[i]
 
-      puts "exact match at position #{i}"
+      exact_matches += 1
       secret_dup[i] = nil
       guess_dup[i] = nil
     end
@@ -74,10 +75,31 @@ class Code
       next if col.nil?
 
       if secret_dup.include?(col)
-        puts 'color match'
+        color_matches += 1
         secret_dup[secret_dup.index(col)] = nil
-      else
-        puts 'no match'
+      end
+    end
+    puts "Exact matches: #{exact_matches}, Color matches: #{color_matches}"
+  end
+
+  def winner?(exact_matches)
+    exact_matches == 4
+  end
+
+  def draw?(player_guess_size)
+    player_guess_size >= 12
+  end
+
+  def play
+    # main game loop
+    loop do
+      if winner?(exact_matches)
+        puts 'Congratulations! You cracked the code! 🎉'
+        secret
+        break
+      elsif draw?(player_guess_size)
+        puts "Game over! You've used all your turns. The secret code was: #{@secret.join}"
+        break
       end
     end
   end
