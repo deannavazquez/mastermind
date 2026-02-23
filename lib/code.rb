@@ -8,6 +8,8 @@ class Code
     @secret = generate_code
     player_guess
     p @secret
+    @player_guess_size = 0
+    @exact_matches = 0
   end
 
   def welcome_message
@@ -35,17 +37,17 @@ class Code
   end
 
   def player_guess
-    i = 1
+    @player_guess_size = 1
     loop do
-      break if i == 12
+      break if @player_guess_size > 12
 
-      puts "=== Starting player_guess #{i}/12 ==="
+      puts "=== Starting player_guess #{@player_guess_size}/12 ==="
       puts "Enter your guess (4 letters) using these colors: #{ALLOWED_COLORS}"
       input = gets.chomp
       guess = input.upcase.split(//)
       if valid_choice?(guess)
         check_color_matches(@secret, guess)
-        i += 1
+        @player_guess_size += 1
       else
         puts 'INVALID MOVE! Please enter a valid guess using the allowed colors and format.'
       end
@@ -60,13 +62,13 @@ class Code
   def check_color_matches(secret, guess) # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
     guess_dup = guess.dup
     secret_dup = secret.dup
-    exact_matches = 0
-    color_matches = 0
+    @exact_matches = 0
+    @color_matches = 0
 
     secret_dup.dup.each_with_index do |col1, i|
       next unless col1 == guess_dup[i]
 
-      exact_matches += 1
+      @exact_matches += 1
       secret_dup[i] = nil
       guess_dup[i] = nil
     end
@@ -75,11 +77,11 @@ class Code
       next if col.nil?
 
       if secret_dup.include?(col)
-        color_matches += 1
+        @color_matches += 1
         secret_dup[secret_dup.index(col)] = nil
       end
     end
-    puts "Exact matches: #{exact_matches}, Color matches: #{color_matches}"
+    puts "✅ Exact matches: #{@exact_matches}, ⚪ Color matches: #{@color_matches}"
   end
 
   def winner?(exact_matches)
@@ -105,4 +107,4 @@ class Code
   end
 end
 
-Code.new
+Code.new.play
