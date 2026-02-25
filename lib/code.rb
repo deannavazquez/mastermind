@@ -1,15 +1,16 @@
 # generate random codes and validates against allowed colors
 class Code
   ALLOWED_COLORS = %w[R G B Y O P].freeze
-  attr_accessor :secret, :player_guess, :exact_matches, :color_matches, :player_guess_size
+  attr_accessor :secret, :exact_matches, :color_matches, :player_guess_size
 
   def initialize
     welcome_message
     @secret = generate_code
-    player_guess
+    # player_guess
     p @secret
     @player_guess_size = 0
     @exact_matches = 0
+    @color_matches = 0
   end
 
   def welcome_message
@@ -37,20 +38,14 @@ class Code
   end
 
   def player_guess
-    @player_guess_size = 1
-    loop do
-      break if @player_guess_size > 12
-
-      puts "=== Starting player_guess #{@player_guess_size}/12 ==="
-      puts "Enter your guess (4 letters) using these colors: #{ALLOWED_COLORS}"
-      input = gets.chomp
-      guess = input.upcase.split(//)
-      if valid_choice?(guess)
-        check_color_matches(@secret, guess)
-        @player_guess_size += 1
-      else
-        puts 'INVALID MOVE! Please enter a valid guess using the allowed colors and format.'
-      end
+    puts "Enter your guess (4 letters) using these colors: #{ALLOWED_COLORS}"
+    input = gets.chomp
+    guess = input.upcase.split(//)
+    if valid_choice?(guess)
+      check_color_matches(@secret, guess)
+      @player_guess_size += 1
+    else
+      puts 'INVALID MOVE! Please enter a valid guess using the allowed colors and format.'
     end
   end
 
@@ -81,25 +76,30 @@ class Code
         secret_dup[secret_dup.index(col)] = nil
       end
     end
+    print_results
+  end
+
+  def print_results
     puts "✅ Exact matches: #{@exact_matches}, ⚪ Color matches: #{@color_matches}"
   end
 
-  def winner?(exact_matches)
-    exact_matches == 4
+  def winner?
+    @exact_matches == 4
   end
 
-  def draw?(player_guess_size)
-    player_guess_size >= 12
+  def draw?
+    @player_guess_size >= 12
   end
 
   def play
     # main game loop
     loop do
-      if winner?(exact_matches)
-        puts 'Congratulations! You cracked the code! 🎉'
-        secret
+      player_guess
+      puts "=== Starting player_guess #{@player_guess_size}/12 ==="
+      if winner?
+        puts "Congratulations! You cracked the code! 🎉  The secret code was: #{@secret.join}"
         break
-      elsif draw?(player_guess_size)
+      elsif draw?
         puts "Game over! You've used all your turns. The secret code was: #{@secret.join}"
         break
       end
@@ -107,4 +107,5 @@ class Code
   end
 end
 
-Code.new.play
+game = Code.new # create the game
+game.play # start the game loop
