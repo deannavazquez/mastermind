@@ -23,7 +23,7 @@ cd mastermind
 
 ## Usage
 ```bash
-ruby mastermind.rb
+ruby main.rb
 ```
 
 ## Features
