@@ -6,7 +6,6 @@ class Code
   def initialize
     welcome_message
     @secret = generate_code
-    # player_guess
     p @secret
     @player_guess_size = 0
     @exact_matches = 0
@@ -14,7 +13,7 @@ class Code
   end
 
   def welcome_message
-    puts '🎯 Welcome to Mastermind!'
+    puts 'Welcome to Mastermind 🎯'
     puts
     puts 'The computer has chosen a secret code made up of 4 colors.'
     puts 'Your goal is to guess the code before you run out of turns.'
@@ -38,14 +37,15 @@ class Code
   end
 
   def player_guess
+    puts "=== Starting player_guess #{@player_guess_size + 1}/12 ==="
     puts "Enter your guess (4 letters) using these colors: #{ALLOWED_COLORS}"
     input = gets.chomp
     guess = input.upcase.split(//)
     if valid_choice?(guess)
-      check_color_matches(@secret, guess)
+      check_color_matches(guess)
       @player_guess_size += 1
     else
-      puts 'INVALID MOVE! Please enter a valid guess using the allowed colors and format.'
+      puts '❌ INVALID MOVE! Please enter a valid guess using the allowed colors and format.'
     end
   end
 
@@ -54,13 +54,13 @@ class Code
     guess.length == 4 && guess.all? { |color| ALLOWED_COLORS.include?(color) }
   end
 
-  def check_color_matches(secret, guess) # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
+  def check_color_matches(guess) # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
     guess_dup = guess.dup
-    secret_dup = secret.dup
+    secret_dup = @secret.dup
     @exact_matches = 0
     @color_matches = 0
 
-    secret_dup.dup.each_with_index do |col1, i|
+    secret_dup.each_with_index do |col1, i|
       next unless col1 == guess_dup[i]
 
       @exact_matches += 1
@@ -68,7 +68,7 @@ class Code
       guess_dup[i] = nil
     end
 
-    guess_dup.each_with_index do |col, i|
+    guess_dup.each do |col|
       next if col.nil?
 
       if secret_dup.include?(col)
@@ -76,7 +76,6 @@ class Code
         secret_dup[secret_dup.index(col)] = nil
       end
     end
-    print_results
   end
 
   def print_results
@@ -95,7 +94,8 @@ class Code
     # main game loop
     loop do
       player_guess
-      puts "=== Starting player_guess #{@player_guess_size}/12 ==="
+      print_results
+      # puts "=== Starting player_guess #{@player_guess_size}/12 ==="
       if winner?
         puts "Congratulations! You cracked the code! 🎉  The secret code was: #{@secret.join}"
         break
