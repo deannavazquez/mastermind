@@ -5,7 +5,6 @@ class Code
 
   def initialize
     @secret = generate_code
-    p @secret
     @exact_matches = 0
     @color_matches = 0
   end
